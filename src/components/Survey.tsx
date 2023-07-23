@@ -13,6 +13,7 @@ const Survey = () => {
     const [isFinished, setIsFinished] = useState(false);
 
     // Loading Title and Image
+
     useEffect(() => {
         setSurveyTitle(surveyData.title);
         setSurveyImage(surveyData.image);0
@@ -59,6 +60,7 @@ const Survey = () => {
     const handleOptionChange = (event) => {
         // Add logic to handle the user's selection
         console.log("Selected option:", event.target.value);
+
     };
 
     return (
@@ -90,6 +92,7 @@ const Survey = () => {
                 ) : (
                 <button onClick={handleStartSurvey}>Start Answering</button>
             )}
+
         </div>
     )
 }
