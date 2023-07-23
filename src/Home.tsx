@@ -6,6 +6,7 @@ import {
     Goerli,
 } from '@usedapp/core'
 import ButtonConnect from "./components/ButtonConnect";
+import Survey from "./components/Survey";
 import {QUIZ_ADDRESS} from "./utils/enums";
 
 function Home() {
@@ -36,6 +37,7 @@ function Home() {
                     </div>
                 )
             }
+            <Survey/>
         </>
 
     )
