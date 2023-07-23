@@ -1,19 +1,23 @@
 import {useEffect, useState} from "react";
 import surveyData from "../assets/survey.json"
+import { observer } from 'mobx-react';
+import { toJS } from 'mobx';
+import AnswerStore from '../store/AnswerStore';
 
 const START_INDEX = 0;
 
 const Survey = () => {
     const [surveyTitle, setSurveyTitle] = useState('');
     const [surveyImage, setSurveyImage] = useState('');
-    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(START_INDEX);
-    console.log('\x1b[42m currentQuestionIndex === \x1b[0m', currentQuestionIndex);
-    const [remainingSeconds, setRemainingSeconds] = useState(surveyData.questions[START_INDEX].lifetimeSeconds);
+    const [currentQuestionIndex, setCurrentQuestionIndex]
+        = useState(START_INDEX);
+    const [remainingSeconds, setRemainingSeconds]
+        = useState(surveyData.questions[START_INDEX].lifetimeSeconds);
     const [isAnswering, setIsAnswering] = useState(false);
     const [isFinished, setIsFinished] = useState(false);
+    const [selectedOption, setSelectedOption] = useState('');
 
     // Loading Title and Image
-
     useEffect(() => {
         setSurveyTitle(surveyData.title);
         setSurveyImage(surveyData.image);0
@@ -21,18 +25,33 @@ const Survey = () => {
 
     const handleNextQuestion = () => {
         setIsAnswering(false);
-        console.log('\x1b[42m currentQuestionIndex === \x1b[0m', currentQuestionIndex);
+
+        // Storing the answer
+        const answer = {
+            question: currentQuestion.text,
+            option: selectedOption,
+        };
+        AnswerStore.addAnswer(answer);
+        const plainAnswers: object = toJS(AnswerStore.answers);
+        console.log('\x1b[42m AnswerStore.answers === \x1b[0m', plainAnswers);
+
+        // Checking the question index
         if (currentQuestionIndex < surveyData.questions.length - 1) {
-            console.log('\x1b[42m INSIDE IF currentQuestionIndex === \x1b[0m', currentQuestionIndex);
-            setRemainingSeconds(surveyData.questions[currentQuestionIndex + 1].lifetimeSeconds);
+            setRemainingSeconds(
+                surveyData.questions[currentQuestionIndex + 1].lifetimeSeconds
+            );
             setCurrentQuestionIndex(currentQuestionIndex + 1);
             setIsAnswering(true)
+            setSelectedOption('')
         } else {
             setIsFinished(true);
             console.log("Survey completed!");
-            // Add logic for survey completion
         }
     };
+
+    useEffect(() => {
+        setSelectedOption('');
+    }, [currentQuestionIndex]);
 
     // Start answering
     useEffect(() => {
@@ -58,9 +77,7 @@ const Survey = () => {
     const currentQuestion = surveyData.questions[currentQuestionIndex];
 
     const handleOptionChange = (event) => {
-        // Add logic to handle the user's selection
-        console.log("Selected option:", event.target.value);
-
+        setSelectedOption(event.target.value);
     };
 
     return (
@@ -81,20 +98,32 @@ const Survey = () => {
                                 name="question-options"
                                 value={option.text}
                                 onChange={handleOptionChange}
+                                checked={selectedOption === option.text}
                             />
-                            <label htmlFor={`option-${index}`}>{option.text}</label>
+                            <label
+                                htmlFor={`option-${index}`}
+                            >
+                                {option.text}
+                            </label>
                         </div>
                     ))}
-                    <button onClick={handleNextQuestion}>Next Question</button>
+                    <button onClick={handleNextQuestion}>
+                        Next Question
+                    </button>
                 </div>
             ) : isFinished ? (
                 <p>Survey Finished</p>
                 ) : (
-                <button onClick={handleStartSurvey}>Start Answering</button>
+                    <>
+                        <br/>
+                        <button onClick={handleStartSurvey}>
+                            Start Answering
+                        </button>
+                    </>
             )}
 
         </div>
     )
 }
 
-export default Survey;
+export default observer(Survey);
