@@ -20,8 +20,12 @@ const Survey = () => {
     // Loading Title and Image
     useEffect(() => {
         setSurveyTitle(surveyData.title);
-        setSurveyImage(surveyData.image);0
+        setSurveyImage(surveyData.image);
     }, []);
+
+    useEffect(() => {
+        console.log('currentQuestionIndex === \x1b[0m', currentQuestionIndex);
+    }, [currentQuestionIndex])
 
     const handleNextQuestion = () => {
         setIsAnswering(false);
@@ -32,6 +36,7 @@ const Survey = () => {
             option: selectedOption,
         };
         AnswerStore.addAnswer(answer);
+        //Printing the answers
         const plainAnswers: object = toJS(AnswerStore.answers);
         console.log('\x1b[42m AnswerStore.answers === \x1b[0m', plainAnswers);
 
@@ -61,7 +66,7 @@ const Survey = () => {
                 setRemainingSeconds((prevSeconds) => prevSeconds - 1);
             }, 1000);
         } else if (remainingSeconds === 0) {
-            console.log('\x1b[42m executing handleNextQuestion === \x1b[0m');
+            console.log('executing handleNextQuestion === \x1b[0m');
             handleNextQuestion();
         }
 
